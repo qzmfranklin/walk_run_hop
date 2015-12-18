@@ -1,0 +1,48 @@
+STATEMENT OF PROBLEM:
+
+A person wears an IMU sensor while performing a combination of walking, running,
+and hopping motions.  Given a comma-separated-value (CSV) file containing 3D
+accelerometer and 3D gyro data from the IMU sensor, write a step counting
+program in C that counts the number of walking steps, the number of running
+steps, and the number of hopping steps in the file.  We ask for a solution in C
+(not C++, python, MATLAB, or anything else, although it is fine to use these
+tools to develop your solution if you wish) since our production firmware is
+written in C.
+
+The program should:
+
+1) Read the csv input file containing the accelerometer and gyro data.
+
+2) Analyze the accelerometer and/or gyro data contained in the input file to
+determine the types of motions (combinations of running, walking, and/or
+hopping) and the number of steps of each.
+
+3) Output should be a CSV file with the original data, plus extra columns for
+the step counter and walk/run/hop distinction.
+
+Repeat this exercise for each of the three supplied input csv files. Each file
+contains various combinations of walking, running, and hopping. The file names
+denote the order in which these motions occur in each file.
+
+Please provide a brief description of your step counting algorithm and how it
+works.  Please discuss the design choices involved, and also provide your source
+code and the printed output from the program for each of the three test cases.
+
+DESCRIPTION OF INPUT FILES:
+
+Each input file is in CSV format and contains a pre-header record (which can be
+ignored), followed by a header record containing the column names. Data records
+follow in time order, at 104 Hz.  Columns of interest are arx, ary, arz
+(accelerometer readings) and grx, gry, grz (gyro readings),  All other columns
+can be ignored.
+
+The accelerometer values are in units of m/sec^2. The gyro readings are in units
+of radians/sec. Gyro rotations are about their respective axes, i.e., grx
+measures the angular rotation rate around the x-axis.
+
+The x, y, and z axes form a right-handed coordinate system for the IMU as
+attached to the person:
+
+  x = backward (points rearward from the person; -x points forward)
+  y = vertical (points upward, opposite to gravity)
+  z = lateral  (points to the left of the person)
