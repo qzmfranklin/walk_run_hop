@@ -1,0 +1,67 @@
+
+=======
+A brief explanation of the algorithm used in stepcounter_next() in
+src/stepcounter.c:
+
+The acceleration in the y, i.e. vertical, direction has very the most well
+formed waves for walk, run, and hop. It goes up very quickly, reaches the peak
+in less than 0.1 seconds, then drop back to below zero.
+
+For convenience, denote acceleration in the y direction as ay. Denote ax as the
+acceleration in the x direction and gz as the angular speed about the z axis.
+
+It was observed that:
+  a) The difference between the ay values from adjacent records is at least
+     5.0 (m/s^2) if and only if the person starts a walking/running/hopping
+     cycle. This can be used to determine the start of a walk/run/hop cycle.
+  b) After ay reaches a peak value (possibly multiple local positive maximi
+  	near the peak), it drops below zero rather smoothly. That is, ay does
+  	not oscilate above and below zero at all when it drops. This can be used
+  	to determine the 'semi-end' of a cycle.
+  c) The width of a wave is usually less than 0.2 seconds, which roughly
+     corresponds to 200 records. Starting from the first sharp increase in
+     ay, within 200 records after it, ax and gz finished their own waves as
+     well. The maximal values (positive maximal and negative maximal are
+     different for this purpose) of ax, ay, and az suffice to decide whether
+     this cycle is a walk, run, or hop.
+  d) The periods, i.e., the time intervals between adjacent peaks, are
+     different for walk, run, and hop too. This can be used to further
+     confirm the decision made with the observation described in (c).
+
+     NOTE: (d) is not implemented yet. Maybe in the future if needed better
+     precision.
+
+For easy reference and future reference, here is the matrix mentioned in (c)
+and (d):
+         |  ax   |   ay   | 4.5*gz |     T
+  -------+-------+--------+--------+----------
+    hop  | 30-40 |  20-40 | 20-40  |  >   1s
+    run  |  ~ 20 |  25-30 | 10-17  |  < 0.7s
+    walk |  < 5  |   5-10 |  < 3   |  >   1s
+
+
+
+=======
+Figures that illustrates the points:
+
+  ./discover.png:
+    shows the ax(red), ay(blue), and gz(green) of hopping, running, and walking
+    period from ./data/Andrew_walk_hop_walk_run_stripped.csv.
+
+    This figure is obtained by:
+        ./scripts/display_csv.py
+
+  ./my_run_walk.png, ./my_walk_hop_walk_run.png, and ./my_walk_run.png:
+    Red, blue, and green spikes indicate the detection of hop, run, and walk
+    step, respectively for the corresponding input csv file.
+    Red, blue, and green dots are ax, ay, and gz, respectively.
+
+    These figures are obtained by:
+        cd src
+        make test
+	(NOTE: You have to close the current plot window to see the next plot
+	window pop up just yet.)
+
+
+=======
+
