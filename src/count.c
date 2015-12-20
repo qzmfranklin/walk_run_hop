@@ -95,19 +95,18 @@ int main(int argc, char *argv[])
 		 * Feed record to the step counter and print the resulting
 		 * walk/hop/run information if this record triggers a step
 		 */
-		fprintf(stderr,"[%4d] %6f %6f %6f ", linenum, record[0], record[1], record[5]);
+		/*fprintf(stderr,"[%4d] %6f %6f %6f ", linenum, record[0], record[1], record[5]);*/
 		linenum++;
 
 		const int step = stepcounter_next(sc, record);
 
-		stepcounter_print(sc);
+		/*stepcounter_print(sc);*/
 
 
 		if (step != STEP_NONE)
 			num_step++;
 		char *typestr = step_string(step);
-		fprintf(stderr,"%4s %zu\n", typestr, num_step);
-		/*fprintf(stderr,"%6f %6f %6f %4s %zu\n", record[0], record[1], record[5], typestr, num_step);*/
+		/*fprintf(stderr,"%4s %zu\n", typestr, num_step);*/
 		free(typestr);
 
 		printf("%s,%zu,%d\n", buf, num_step, step);

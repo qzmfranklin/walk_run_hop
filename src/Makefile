@@ -9,16 +9,21 @@ D       :=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))# this directory
 # List all the executables you want to run when you type `make test` in $(TESTS)
 # Note that you need to -include $(ROOT)/gtest/rules.mk to actually build those
 # executables
-TESTS:=count.exe
+EXE:=count.exe
+
+DATA:=$(wildcard ../data/*.csv)
+MY_DATA:=$(DATA:%.csv=%.csv.2)
 
 .PHONY: all asm clean test
 all: $(OBJ)
 asm: $(ASM)
 clean:
 	$(QUIET)rm -f *.exe $(OBJ) $(DEP) $(ASM)
-test: $(TESTS)
-	find ../data/*.csv -exec ./count.exe {} 2> /dev/null > {}.2 \;
-	find ../data/*.csv.2 -exec ../scripts/show_my_csv.py {} \;
+test: $(EXE)
+	$(QUIET)echo "Close the current plot window, then the next plot will pop up"
+	$(QUIET)for t in $(DATA) ; do ./count.exe "$${t}" > "$${t}.2" ; done
+	$(QUIET)for t in $(MY_DATA) ; do ../scripts/show_my_csv.py "$${t}"$& ; done
+
 
 # Sample linking rules for building executables:
 count.exe: $(D)/count.o $(D)/stepcounter.o

@@ -32,73 +32,72 @@ gtitlelist = ['gx', 'gy', 'gz']
 
 # Plot ax ay az gx gz gy against t
 
-fig1 = plt.figure()
+## Seperate views
+#fig1 = plt.figure()
 
 
-mplt = fig1.add_subplot(311)
-start = 1000
-end   = 1300
-num_records = end - start
-delta_t = 1.0 / FREQUENCY # second
-t = np.linspace(0.0, delta_t * num_records, num_records)
-zeros = np.linspace(0.0, 0.0, num_records)
-mplt.set_title('ax, ay, gz, hop')
-mplt.plot(t, zeros, color = 'black')
-mplt.plot(t,        raw_data[0, start:end], 'or--', color = 'red')
-mplt.plot(t,        raw_data[1, start:end], 'or--', color = 'blue')
-mplt.plot(t, 4.5 *  raw_data[5, start:end], 'or--', color = 'green')
-mplt.plot(t, [ 50 if x == 1 else 0 for x in raw_data[7, start:end]], color = 'black')
+#mplt = fig1.add_subplot(311)
+#start = 1000
+#end   = 1300
+#num_records = end - start
+#delta_t = 1.0 / FREQUENCY # second
+#t = np.linspace(0.0, delta_t * num_records, num_records)
+#zeros = np.linspace(0.0, 0.0, num_records)
+#mplt.set_title('ax, ay, gz, hop')
+#mplt.plot(t, zeros, color = 'black')
+#mplt.plot(t,        raw_data[0, start:end], 'or--', color = 'red')
+#mplt.plot(t,        raw_data[1, start:end], 'or--', color = 'blue')
+#mplt.plot(t, 4.5 *  raw_data[5, start:end], 'or--', color = 'green')
+#mplt.plot(t, [ 50 if x == 1 else 0 for x in raw_data[7, start:end]], color = 'black')
 
 
-mplt = fig1.add_subplot(312)
-start = 1800
-end   = 2100
-num_records = end - start
-delta_t = 1.0 / FREQUENCY # second
-t = np.linspace(0.0, delta_t * num_records, num_records)
-zeros = np.linspace(0.0, 0.0, num_records)
-mplt.set_title('ax, ay, gz, run')
-mplt.plot(t, zeros, color = 'black')
-mplt.plot(t,        raw_data[0, start:end], 'or--', color = 'red')
-mplt.plot(t,        raw_data[1, start:end], 'or--', color = 'blue')
-mplt.plot(t, 4.5 *  raw_data[5, start:end], 'or--', color = 'green')
-mplt.plot(t, [ 50 if x == 2 else 0 for x in raw_data[7, start:end]], color = 'black')
+#mplt = fig1.add_subplot(312)
+#start = 1800
+#end   = 2100
+#num_records = end - start
+#delta_t = 1.0 / FREQUENCY # second
+#t = np.linspace(0.0, delta_t * num_records, num_records)
+#zeros = np.linspace(0.0, 0.0, num_records)
+#mplt.set_title('ax, ay, gz, run')
+#mplt.plot(t, zeros, color = 'black')
+#mplt.plot(t,        raw_data[0, start:end], 'or--', color = 'red')
+#mplt.plot(t,        raw_data[1, start:end], 'or--', color = 'blue')
+#mplt.plot(t, 4.5 *  raw_data[5, start:end], 'or--', color = 'green')
+#mplt.plot(t, [ 50 if x == 2 else 0 for x in raw_data[7, start:end]], color = 'black')
 
 
-mplt = fig1.add_subplot(313)
-start = 1400
-end   = 1700
-num_records = end - start
-delta_t = 1.0 / FREQUENCY # second
-t = np.linspace(0.0, delta_t * num_records, num_records)
-zeros = np.linspace(0.0, 0.0, num_records)
-mplt.set_title('ax, ay, gz, walk')
-mplt.plot(t, zeros, color = 'black')
-mplt.plot(t,        raw_data[0, start:end], 'or--', color = 'red')
-mplt.plot(t,        raw_data[1, start:end], 'or--', color = 'blue')
-mplt.plot(t, 4.5 *  raw_data[5, start:end], 'or--', color = 'green')
-mplt.plot(t, [ 50 if x == 3 else 0 for x in raw_data[7, start:end]], color = 'black')
+#mplt = fig1.add_subplot(313)
+#start = 1400
+#end   = 1700
+#num_records = end - start
+#delta_t = 1.0 / FREQUENCY # second
+#t = np.linspace(0.0, delta_t * num_records, num_records)
+#zeros = np.linspace(0.0, 0.0, num_records)
+#mplt.set_title('ax, ay, gz, walk')
+#mplt.plot(t, zeros, color = 'black')
+#mplt.plot(t,        raw_data[0, start:end], 'or--', color = 'red')
+#mplt.plot(t,        raw_data[1, start:end], 'or--', color = 'blue')
+#mplt.plot(t, 4.5 *  raw_data[5, start:end], 'or--', color = 'green')
+#mplt.plot(t, [ 50 if x == 3 else 0 for x in raw_data[7, start:end]], color = 'black')
 
 
 
+# Overview
 fig2 = plt.figure()
 
-
 mplt = fig2.add_subplot(111)
-start = 500
-end   = 2200
-num_records = end - start
+num_records = len(raw_data[0])
 delta_t = 1.0 / FREQUENCY # second
 t = np.linspace(0.0, delta_t * num_records, num_records)
 zeros = np.linspace(0.0, 0.0, num_records)
 mplt.set_title('ax, ay, gz, hop')
 mplt.plot(t, zeros, color = 'black')
-#mplt.plot(t,        raw_data[0, start:end], 'or--', color = 'red')
-mplt.plot(t,        raw_data[1, start:end], 'or--', color = 'blue')
-#mplt.plot(t, 4.5 *  raw_data[5, start:end], 'or--', color = 'green')
-mplt.plot(t, [ 50 if x == 1 else 0 for x in raw_data[7, start:end]], color = 'red')
-mplt.plot(t, [ 50 if x == 2 else 0 for x in raw_data[7, start:end]], color = 'blue')
-mplt.plot(t, [ 50 if x == 3 else 0 for x in raw_data[7, start:end]], color = 'green')
+#mplt.plot(t,        raw_data[0, :], 'or--', color = 'red')
+mplt.plot(t,        raw_data[1, :], 'or--', color = 'blue')
+mplt.plot(t, 4.5 *  raw_data[5, :], 'or--', color = 'green')
+mplt.plot(t, [ 50 if x == 1 else 0 for x in raw_data[7, :]], color = 'red')
+mplt.plot(t, [ 50 if x == 2 else 0 for x in raw_data[7, :]], color = 'blue')
+mplt.plot(t, [ 50 if x == 3 else 0 for x in raw_data[7, :]], color = 'green')
 
 
 # aplot = fig1.add_subplot(111)
