@@ -1,6 +1,8 @@
 #ifndef macro_StepCounter_h
 #define macro_StepCounter_h
 
+#include <stdlib.h>
+
 enum {
 	STEP_NONE = 0,
 	STEP_WALK,
@@ -8,15 +10,17 @@ enum {
 	STEP_HOP
 };
 
-extern static const STEPCOUNTER_HISTORY_LENGTH;
-
+/* Completely opaque stepcounter class */
 typedef struct _stepcounter {
 	double *_ax_record;
 	double *_ay_record;
 	double *_gz_record;
 
+	uint16_t _record_count;
 	int _record_begin;
 	int _record_curr;
+
+	int _state;
 } stepcounter;
 
 /*
@@ -35,7 +39,14 @@ stepcounter *stepcounter_create();
  *
  * The algorithm used for determining the step is explained in the .c file.
  */
-int stepcounter_next(const double*);
+int stepcounter_next(stepcounter *sc, const double*);
+
+/*
+ * Reached the end of records. Internally, the step counter checks any cached
+ * records and return an integer, which is one of STEP_NONE, STEP_WALK,
+ * STEP_RUN, and STEP_HOP to indicate the result of the check.
+ */
+int stepcounter_end();
 
 /*
  * Release resources allocated to the step counter object.
