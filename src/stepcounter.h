@@ -5,9 +5,9 @@
 
 enum {
 	STEP_NONE = 0,
-	STEP_WALK,
+	STEP_HOP,
 	STEP_RUN,
-	STEP_HOP
+	STEP_WALK
 };
 
 /*

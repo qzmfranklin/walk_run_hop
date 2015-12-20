@@ -210,7 +210,7 @@ int _stepcounter_get_step_from_record_cache(stepcounter *sc)
 	 * individual's specific condition.
 	 */
 
-	printf("ay_peak = %f\n", ay_peak);
+	fprintf(stderr,"ay_peak = %f\n", ay_peak);
 
 	if (ay_peak < 5.0)
 		return STEP_NONE;
@@ -235,13 +235,13 @@ int stepcounter_next(stepcounter *sc, const double *record)
 		 * than the threshold value, we consider this as the start of a
 		 * peak.
 		 */
-		printf("_state == _STATE_NORMAL\n");
+		fprintf(stderr,"_state == _STATE_NORMAL\n");
 		const double ay_prev = sc->_ay_record[(sc->_record_curr - 1) % STEPCOUNTER_HISTORY_LENGTH];
 		const double ay_curr = sc->_ay_record[sc->_record_curr];
 		const double ay_delta = fabs(ay_curr - ay_prev);
-		printf("ay_delta = %f - %f = %f\n", ay_curr, ay_prev, ay_delta);
+		fprintf(stderr,"ay_delta = %f - %f = %f\n", ay_curr, ay_prev, ay_delta);
 		if (ay_delta > 3.0) {
-			printf("ay_delta (%6f) > 3.0\n", ay_delta);
+			fprintf(stderr,"ay_delta (%6f) > 3.0\n", ay_delta);
 			sc->_state = _STATE_PEAK;
 			sc->_num_peak_records = 1;
 		}
@@ -283,8 +283,8 @@ void stepcounter_free(stepcounter *sc)
 
 void stepcounter_print(stepcounter *sc)
 {
-	printf("_record_count = %u\n", sc->_record_count);
-	printf("_record_begin = %d\n", sc->_record_begin);
-	printf("_record_curr  = %d\n", sc->_record_curr);
-	printf("_state        = %s\n", sc->_state == _STATE_NORMAL ? "NORMAL" : "PEAK");
+	fprintf(stderr,"_record_count = %u\n", sc->_record_count);
+	fprintf(stderr,"_record_begin = %d\n", sc->_record_begin);
+	fprintf(stderr,"_record_curr  = %d\n", sc->_record_curr);
+	fprintf(stderr,"_state        = %s\n", sc->_state == _STATE_NORMAL ? "NORMAL" : "PEAK");
 }

@@ -21,17 +21,31 @@ int main(int argc, char *argv[])
 
 	ssize_t bytesread;
 
-	/* skip the two header rows */
+	{ /* skip the two header rows */
 	bytesread = getline(&buf, &bufsize, fin);
+	if (buf[bytesread - 1] == '\n') bytesread--;
+	if (buf[bytesread - 1] == '\r') bytesread--;
+	buf[bytesread] = 0;
+	printf("%s\n", buf);
+
 	bytesread = getline(&buf, &bufsize, fin);
+	if (buf[bytesread - 1] == '\n') bytesread--;
+	if (buf[bytesread - 1] == '\r') bytesread--;
+	buf[bytesread] = 0;
+	printf("%s,NUM_STEP,STEP_TYPE\n", buf);
+	}
 
 	stepcounter *sc = stepcounter_create();
 
 	size_t num_step = 0;
 	int linenum = 0;
+
 	while( (bytesread = getline(&buf, &bufsize, fin)) != -1 ) {
-		/* strip the trailing \n and make it C string */
-		buf[bytesread - 1] = 0;
+		/* Goodness, this csv file was from Windows? */
+		/* strip the trailing \r\n and make it C string */
+		if (buf[bytesread - 1] == '\n') bytesread--;
+		if (buf[bytesread - 1] == '\r') bytesread--;
+		buf[bytesread] = 0;
 		/*printf("%s\n", buf);*/
 
 		size_t offset = 0;
@@ -57,7 +71,7 @@ int main(int argc, char *argv[])
 		char tokbuf[32];
 		size_t last = offset + 1;
 
-		while(offset <= bytesread - 1) {
+		while(offset <= bytesread) {
 			if (buf[offset] != ',' && buf[offset] != 0) {
 				offset++;
 				continue;
@@ -81,7 +95,7 @@ int main(int argc, char *argv[])
 		 * Feed record to the step counter and print the resulting
 		 * walk/hop/run information if this record triggers a step
 		 */
-		printf("[%4d] %6f %6f %6f ", linenum, record[0], record[1], record[5]);
+		fprintf(stderr,"[%4d] %6f %6f %6f ", linenum, record[0], record[1], record[5]);
 		linenum++;
 
 		const int step = stepcounter_next(sc, record);
@@ -92,10 +106,12 @@ int main(int argc, char *argv[])
 		if (step != STEP_NONE)
 			num_step++;
 		char *typestr = step_string(step);
-		printf("%4s %zu\n", typestr, num_step);
-		/*printf("%6f %6f %6f %4s %zu\n", record[0], record[1], record[5], typestr, num_step);*/
+		fprintf(stderr,"%4s %zu\n", typestr, num_step);
+		/*fprintf(stderr,"%6f %6f %6f %4s %zu\n", record[0], record[1], record[5], typestr, num_step);*/
 		free(typestr);
-	}
+
+		printf("%s,%zu,%d\n", buf, num_step, step);
+	} // while(1)
 
 	stepcounter_free(sc);
 
