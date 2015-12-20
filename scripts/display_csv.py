@@ -3,13 +3,15 @@
 # Make a legend for specific lines.
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 FREQUENCY = 104     # Hz
 
 
 # Load csv file into numpy arrays
-# fname = '../data/Andrew_run_walk_stripped.csv'
-fname = '../data/Andrew_walk_hop_walk_run_stripped.csv'
+fname = os.path.realpath(os.path.join(
+    os.path.dirname(os.path.realpath(__file__)),
+    '../data/', 'Andrew_walk_hop_walk_run_stripped.csv'))
 
 raw_data = np.genfromtxt(fname, delimiter = ',', skip_header = 2, usecols =
         (4,5,6,7,8,9)).transpose()
