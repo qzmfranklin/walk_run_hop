@@ -1,4 +1,3 @@
-
 =======
 A brief explanation of the algorithm used in stepcounter_next() in
 src/stepcounter.c:
@@ -64,4 +63,73 @@ Figures that illustrates the points:
 
 
 =======
+Results (CSV):
+
+  The results csv files are stored as data/*.csv.2
+
+  The three pictures, my_run_walk.png, my_walk_run.png, and
+  my_walk_hop_walk_run.png show how well/badly my current solution does.
+
+  There are false positives, incorrect type, and false negatives. But overall,
+  this algorithm, as in this current implementation, works pretty well given
+  that it is only using the peak values of ay and gz. At least, ax and T can
+  also be used to enhance the detection efficiency.
+
+
+=======
+Source Files in C:
+
+  All source files are in src/
+
+  count.c:
+    The driver routine that parses the csv file and output to the csv file.
+
+  stepcounter.c, stepcounter.h:
+    C API for detecting steps and step types.
+    This API is designed to be very easy to change in the future and easy for
+    debugging as well.
+
+======
+Build and test:
+
+  I only tested everything on MacOSX Yosimite with the latest developer tools.
+
+  Requirements:
+    The clang compiler, or a C99 compliant compiler.
+    A working python3 program that can be found by /usr/bin/env.
+
+  Build:
+    cd src
+    make test
+    (The you will see graphs popping up, and you can find the result files as
+    data/*.csv.2)
+
+======
+TODO:
+
+  - Utilize ax and T to further enhance the model. Though, I do not want to go
+    too much in that direction with only these data because if I try too hard
+    with so little data, I risk overfitting the data with too many parameters.
+
+  - Develop more efficient wave detection algorithms. I already thought of
+    several. I did not do them because they are significantly more complex than
+    the current implementation and the gains might very well not be worth the
+    effort for the purpose of this test.
+
+  - Probably use wavelets and FFT, i.e., frequency domain information to detect
+    the running mode of the record stream. This is another way of using the
+    period mentioned above, but also allows for better detection of
+    start-of-waves.
+
+  - Extract the several magic numbers used in the .c files. They should be put
+    in a configuration file that the count.exe program reads in when processing
+    incoming records streams.
+
+  - Build up a training algorithm that trains the above configuration file using
+    customized data. This virtually allows this algorithm to apply to a much
+    broader user group and get more data/feedback.
+
+  - Clean up the python scripts and the Makefile's test target. They are so
+    messy right now.
+
 
