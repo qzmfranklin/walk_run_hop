@@ -18,7 +18,8 @@ clean:
 	$(QUIET)rm -f *.exe $(OBJ) $(DEP) $(ASM)
 test: $(TESTS)
 	#$(QUIET)for t in $^ ; do ./"$$t" || exit 1 ; done
-	$(QUIET)find ../data/*.csv -exec ./count.exe {} as \;
+	#$(QUIET)find ../data/*.csv -exec ./count.exe {} as \;
+	./count.exe ../data/Andrew_walk_hop_walk_run_stripped.csv
 
 # Sample linking rules for building executables:
-count.exe: $(D)/count.o
+count.exe: $(D)/count.o $(D)/stepcounter.o

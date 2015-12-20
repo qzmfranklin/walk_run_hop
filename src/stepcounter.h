@@ -10,6 +10,13 @@ enum {
 	STEP_HOP
 };
 
+/*
+ * Human readable C string for the type of step.
+ * The caller should always free the allocated memory, even when it is
+ * STEP_NONE.
+ */
+char *step_string(const int);
+
 /* Completely opaque stepcounter class */
 typedef struct _stepcounter {
 	double *_ax_record;
@@ -17,8 +24,10 @@ typedef struct _stepcounter {
 	double *_gz_record;
 
 	uint16_t _record_count;
+	uint16_t _num_peak_records;
 	int _record_begin;
 	int _record_curr;
+
 
 	int _state;
 } stepcounter;
@@ -52,5 +61,10 @@ int stepcounter_end();
  * Release resources allocated to the step counter object.
  */
 void stepcounter_free(stepcounter*);
+
+/*
+ * Dump internal information for easy debugging.
+ */
+void stepcounter_print(stepcounter*);
 
 #endif /* end of include guard */

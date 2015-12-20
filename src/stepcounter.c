@@ -5,7 +5,27 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+char *step_string(const int step)
+{
+	char *str = (char*) malloc(6);
+	switch (step) {
+	case STEP_NONE:
+		strcpy(str, "NONE");
+		break;
+	case STEP_WALK:
+		strcpy(str, "WALK");
+		break;
+	case STEP_RUN:
+		strcpy(str, "RUN");
+		break;
+	case STEP_HOP:
+		strcpy(str, "HOP");
+		break;
+	}
+	return str;
+}
 
 /*
  * A brief explanation of the algorithm used in stepcounter_next():
@@ -54,7 +74,7 @@
  * configured as is adjustable with customized user input. But for the purpose
  * of prototyping, this is good enough.
  */
-static const uint16_t STEPCOUNTER_HISTORY_LENGTH = 30;
+static const uint16_t STEPCOUNTER_HISTORY_LENGTH = 300;
 
 /*
  * Append record to the end of cache. If the cache is full, the oldest record
@@ -87,6 +107,7 @@ void _stepcounter_record_reset(stepcounter *sc)
 	sc->_record_begin = 0;
 	sc->_record_curr = -1;
 	sc->_record_count = 0;
+	sc->_num_peak_records = 0;
 }
 
 enum {
@@ -164,8 +185,8 @@ int _stepcounter_get_step_from_record_cache(stepcounter *sc)
 	double ax_min = DBL_MAX;
 	double ay_min = DBL_MAX;
 	double gz_min = DBL_MAX;
-	for (int i = 0; i < sc->_record_count; i++) {
-		const int offset = (sc->_record_begin + i) % STEPCOUNTER_HISTORY_LENGTH;
+	for (int i = 0; i < sc->_num_peak_records; i++) {
+		const int offset = (sc->_record_curr - i) % STEPCOUNTER_HISTORY_LENGTH;
 		const double ax = sc->_ax_record[offset];
 		const double ay = sc->_ay_record[offset];
 		const double gz = sc->_gz_record[offset];
@@ -188,6 +209,9 @@ int _stepcounter_get_step_from_record_cache(stepcounter *sc)
 	 * it in a configuration file that can be trained to better fit each
 	 * individual's specific condition.
 	 */
+
+	printf("ay_peak = %f\n", ay_peak);
+
 	if (ay_peak < 5.0)
 		return STEP_NONE;
 
@@ -201,13 +225,9 @@ int _stepcounter_get_step_from_record_cache(stepcounter *sc)
 		return STEP_RUN;
 }
 
-static const double STEPCOUNTER_AY_DELTA_THRESHOLD = 5.0;
 int stepcounter_next(stepcounter *sc, const double *record)
 {
-
-	/* If this is the first record, just put it into the history cache */
-	if (sc->_record_count == 0)
-		return STEP_NONE;
+	_stepcounter_record_append(sc, record);
 
 	if (sc->_state == _STATE_NORMAL) {
 		/*
@@ -215,13 +235,15 @@ int stepcounter_next(stepcounter *sc, const double *record)
 		 * than the threshold value, we consider this as the start of a
 		 * peak.
 		 */
-		const double ay_delta =
-			sc->_ay_record[sc->_record_curr] -
-			sc->_ay_record[sc->_record_curr - 1];
-		if (ay_delta > STEPCOUNTER_AY_DELTA_THRESHOLD) {
+		printf("_state == _STATE_NORMAL\n");
+		const double ay_prev = sc->_ay_record[(sc->_record_curr - 1) % STEPCOUNTER_HISTORY_LENGTH];
+		const double ay_curr = sc->_ay_record[sc->_record_curr];
+		const double ay_delta = fabs(ay_curr - ay_prev);
+		printf("ay_delta = %f - %f = %f\n", ay_curr, ay_prev, ay_delta);
+		if (ay_delta > 3.0) {
+			printf("ay_delta (%6f) > 3.0\n", ay_delta);
 			sc->_state = _STATE_PEAK;
-			_stepcounter_record_reset(sc);
-			_stepcounter_record_append(sc, record);
+			sc->_num_peak_records = 1;
 		}
 	} else if (sc->_state == _STATE_PEAK) {
 		/*
@@ -230,20 +252,17 @@ int stepcounter_next(stepcounter *sc, const double *record)
 		 * (c) to determine the most probable one out of walk, hop, and
 		 * run.
 		 */
-		assert(sc->_record_count);
-		const double new_ay = sc->_ay_record[sc->_record_curr];
-		const double old_ay = sc->_ay_record[sc->_record_curr - 1];
-		if (sc->_record_count > 50 || (new_ay < old_ay && new_ay < 0.0)) {
+		assert(sc->_num_peak_records > 0);
+		sc->_num_peak_records++;
+		const double ay_curr = sc->_ay_record[sc->_record_curr];
+		const double ay_prev = sc->_ay_record[sc->_record_curr - 1];
+		if (sc->_record_count > 30 || (ay_curr < ay_prev && ay_curr < 0.0)) {
 			/*
 			 * NOTE: _stepcounter_get_step_from_record_cache() does
 			 * not modify sc.
 			 */
-			const int retval =
-				_stepcounter_get_step_from_record_cache(sc);
 			sc->_state = _STATE_NORMAL;
-			return retval;
-		} else {
-			_stepcounter_record_append(sc, record);
+			return _stepcounter_get_step_from_record_cache(sc);
 		}
 	} else {
 		fprintf(stderr,"stepcounter internal errror: Internal state can only be _STATE_NORMAL or _STATE_PEAK\n");
@@ -260,4 +279,12 @@ void stepcounter_free(stepcounter *sc)
 	free(sc->_ay_record);
 	free(sc->_gz_record);
 	free(sc);
+}
+
+void stepcounter_print(stepcounter *sc)
+{
+	printf("_record_count = %u\n", sc->_record_count);
+	printf("_record_begin = %d\n", sc->_record_begin);
+	printf("_record_curr  = %d\n", sc->_record_curr);
+	printf("_state        = %s\n", sc->_state == _STATE_NORMAL ? "NORMAL" : "PEAK");
 }

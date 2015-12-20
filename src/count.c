@@ -1,8 +1,8 @@
+#include "stepcounter.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-/*#include "stepcounter.h"*/
 
 /*
  * Coding style is the same as the Linux kernel, per this document:
@@ -25,10 +25,14 @@ int main(int argc, char *argv[])
 	bytesread = getline(&buf, &bufsize, fin);
 	bytesread = getline(&buf, &bufsize, fin);
 
+	stepcounter *sc = stepcounter_create();
+
+	size_t num_step = 0;
+	int linenum = 0;
 	while( (bytesread = getline(&buf, &bufsize, fin)) != -1 ) {
 		/* strip the trailing \n and make it C string */
 		buf[bytesread - 1] = 0;
-		printf("%s\n", buf);
+		/*printf("%s\n", buf);*/
 
 		size_t offset = 0;
 
@@ -43,9 +47,10 @@ int main(int argc, char *argv[])
 
 		/* Hereby offset points to one char before first char for ax. */
 
-		{ /* Parse six decimal numbers, store them in record[6] */
 		/* ax, ay, az, gx, gy, gz */
 		double record[6];
+
+		{ /* Parse six decimal numbers, store them in record[6] */
 		size_t record_offset = 0;
 
 		/* string buffer for the decimal number */
@@ -76,9 +81,23 @@ int main(int argc, char *argv[])
 		 * Feed record to the step counter and print the resulting
 		 * walk/hop/run information if this record triggers a step
 		 */
-		/*const step_t step = stepcounter_next(sc, record);*/
-		/*step_print(&step);*/
+		printf("[%4d] %6f %6f %6f ", linenum, record[0], record[1], record[5]);
+		linenum++;
+
+		const int step = stepcounter_next(sc, record);
+
+		stepcounter_print(sc);
+
+
+		if (step != STEP_NONE)
+			num_step++;
+		char *typestr = step_string(step);
+		printf("%4s %zu\n", typestr, num_step);
+		/*printf("%6f %6f %6f %4s %zu\n", record[0], record[1], record[5], typestr, num_step);*/
+		free(typestr);
 	}
+
+	stepcounter_free(sc);
 
 	return 0;
 }
